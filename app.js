@@ -232,6 +232,7 @@ function nextDay() {
   return i < 0 ? 'A' : q[(i + 1) % q.length];
 }
 
+function emit(name, detail) { try { window.dispatchEvent(new CustomEvent('gb:' + name, { detail })); } catch (e) { /* ignore */ } }
 function toast(msg) {
   const t = $('#toast'); t.textContent = msg; t.hidden = false;
   clearTimeout(toast._t); toast._t = setTimeout(() => { t.hidden = true; }, 2200);
@@ -391,6 +392,7 @@ function render() {
   else if (tab === 'library') renderLibrary(v);
   else renderSettings(v);
   renderBar();
+  emit('render', { tab });
   window.scrollTo(0, 0);
 }
 
@@ -478,7 +480,7 @@ function renderWorkout(v) {
     return '<button class="chip' + (k === viewDay ? ' sel' : '') + (doneThisWeek.has(k) ? ' done' : '') + '" data-day="' + k + '">' + k + '<small>' + (k === nd ? 'NEXT' : opt ? 'optional' : '&nbsp;') + '</small></button>';
   }).join('');
 
-  let html = '<div class="chips" role="tablist" aria-label="Pick workout day">' + strip + '</div>' +
+  let html = '<div id="social-live"></div><div class="chips" role="tablist" aria-label="Pick workout day">' + strip + '</div>' +
     '<div class="sec-title"><h2 style="margin:4px 0">Day ' + viewDay + ' · ' + esc(day.title) + '</h2></div>' +
     '<div class="card"><div class="switch"><label for="flare"><b>Flare-up day</b><div class="small muted">Swaps RDL, rower &amp; split squat for gentler moves</div></label>' +
     '<input type="checkbox" id="flare"' + (S.settings.flare ? ' checked' : '') + '></div></div>' +
@@ -522,7 +524,7 @@ document.addEventListener('click', e => {
   if (dayBtn) {
     const nd = dayBtn.dataset.day; if (nd === viewDay) return;
     if (hasActivity(S.draft) && S.draft.day !== nd && !confirm('Switch day and discard the workout in progress?')) return;
-    if (S.draft && S.draft.day !== nd) S.draft = null;
+    if (S.draft && S.draft.day !== nd) { if (hasActivity(S.draft)) emit('live-end'); S.draft = null; }
     viewDay = nd; itReset(); return render();
   }
   const pr = t.closest('[data-preset]'); if (pr) { ensureDraft(viewDay).cardio = pr.dataset.preset; itPreset(pr.dataset.preset); save(); return render(); }
@@ -536,7 +538,7 @@ document.addEventListener('click', e => {
   const hold = t.closest('[data-hold]'); if (hold) return startCountdown(hold.dataset.label, +hold.dataset.hold);
   const act = t.closest('[data-act]');
   if (act) {
-    if (act.dataset.act === 'start') { startIfNeeded(); save(); }
+    if (act.dataset.act === 'start') { startIfNeeded(); save(); emitLive(null); }
     else if (act.dataset.act === 'finish') finishDialog();
   }
 });
@@ -548,7 +550,7 @@ document.addEventListener('change', e => {
   if (t.dataset && t.dataset.chk) {
     S.draft.checks[t.dataset.chk] = t.checked; startIfNeeded();
     const card = t.closest('.card.compact'); if (card && !t.closest('.row.wrap')) card.classList.toggle('done', t.checked);
-    save(); updateCounts(); return;
+    save(); updateCounts(); emitLive(t.closest('[data-card]')); return;
   }
   if (t.classList.contains('setdone')) {
     const arr = S.draft.sets[t.dataset.key]; if (!arr) return; const s = arr[+t.dataset.i]; const it = CUR.items[t.dataset.key];
@@ -556,7 +558,7 @@ document.addEventListener('change', e => {
     if (t.checked && (s.r === '' || s.r == null) && it) { s.r = it.secs && it.rmin !== it.rmax ? it.rmin : it.rmax; const ri = $('.setr[data-key="' + t.dataset.key + '"][data-i="' + t.dataset.i + '"]'); if (ri) { ri.value = s.r; ri.classList.add('auto'); } }
     if (t.checked) toast('Nailed it ✓');
     if (t.checked && S.settings.autoRest) startCountdown('Rest', S.settings.restSecs);
-    save(); updateCounts(); return;
+    save(); updateCounts(); emitLive(t.closest('[data-card]'), +t.dataset.i); return;
   }
 });
 document.addEventListener('focusin', e => { if (e.target.classList && e.target.classList.contains('setr')) setTimeout(() => e.target.select && e.target.select(), 0); });
@@ -603,6 +605,7 @@ function finishDialog() {
       if (d.day === 'D' && d.checks.cardio && !S.settings.flare) sess.cardio = { type: d.cardio || IT.preset, work: IT.work, rest: IT.rest, rounds: IT.rounds };
       sess.warmDone = $$('[data-sec="warm"] input.cnt:checked').length; sess.coolDone = $$('[data-sec="cool"] input.cnt:checked').length;
       S.sessions.push(sess); S.draft = null; viewDay = null; save(); dlg.close(); itReset(); stopCountdown();
+      emit('finish', { session: sess }); emit('session-saved', { session: sess });
       toast('Workout saved — nicely done ✦'); tab = 'progress'; render();
     });
   });
@@ -668,7 +671,8 @@ function renderProgress(v) {
   let h = '<h2 style="margin-top:4px">This week</h2><div class="card"><div class="row"><b class="grow">' + cnt + ' of ' + goal + ' workouts</b><span class="muted small">goal ' + goal + '/week</span></div>' +
     '<div class="bar" style="margin-top:8px"><i style="width:' + Math.min(100, cnt / goal * 100) + '%"></i></div></div>' +
     '<div class="streak">' + (weekStreak() > 0 ? 'You’re on fire 🔥 ' + weekStreak() + (weekStreak() === 1 ? ' week' : ' weeks') + ' in a row' : 'Your streak starts with one workout') + '<small>Hit your ' + goal + ' workouts a week to keep it going</small></div>' +
-    '<div class="stats"><div class="stat"><b>' + weekStreak() + '</b><span>week streak</span></div><div class="stat"><b>' + S.sessions.length + '</b><span>total sessions</span></div><div class="stat"><b>' + (ss.length ? fmtDate(ss[ss.length - 1].date, { month: 'short', day: 'numeric' }) : '—') + '</b><span>last workout</span></div></div>';
+    '<div class="stats"><div class="stat"><b>' + weekStreak() + '</b><span>week streak</span></div><div class="stat"><b>' + S.sessions.length + '</b><span>total sessions</span></div><div class="stat"><b>' + (ss.length ? fmtDate(ss[ss.length - 1].date, { month: 'short', day: 'numeric' }) : '—') + '</b><span>last workout</span></div></div>' +
+    '<div id="social-board"></div>';
 
   /* calendar */
   const y = calMonth.getFullYear(), m = calMonth.getMonth(); const first = new Date(y, m, 1); const lead = (first.getDay() + 6) % 7; const dim = new Date(y, m + 1, 0).getDate();
@@ -717,7 +721,7 @@ document.addEventListener('change', e => { if (e.target.id === 'progex') { progE
 document.addEventListener('click', e => {
   const c = e.target.closest('[data-cal]'); if (c) { calMonth = new Date(calMonth.getFullYear(), calMonth.getMonth() + +c.dataset.cal, 1); render(); return; }
   const del = e.target.closest('[data-del]');
-  if (del) { if (confirm('Delete this workout from your history?')) { S.sessions = S.sessions.filter(s => s.id !== del.dataset.del); save(); render(); toast('Deleted'); } return; }
+  if (del) { if (confirm('Delete this workout from your history?')) { S.sessions = S.sessions.filter(s => s.id !== del.dataset.del); save(); emit('session-deleted', { id: del.dataset.del }); render(); toast('Deleted'); } return; }
   const ed = e.target.closest('[data-edit]'); if (ed) editDialog(ed.dataset.edit);
 });
 
@@ -751,7 +755,7 @@ function editDialog(id) {
         const [ei, si, f] = inp.dataset.e.split('.'); const z = s.entries[+ei].sets[+si];
         if (f === 'd') z.done = inp.checked; else if (f === 'r') z.r = inp.value === '' ? null : +inp.value; else if (inp.value !== inp.dataset.orig) z.w = inp.value === '' ? null : +fromDisp(+inp.value).toFixed(2);
       });
-      save(); dlg.close(); render(); toast('Saved ✓');
+      save(); emit('session-saved', { session: s }); dlg.close(); render(); toast('Saved ✓');
     });
   });
 }
@@ -780,7 +784,7 @@ document.addEventListener('input', e => {
 function renderSettings(v) {
   const st = S.settings;
   const seg = (name, opts, val) => '<div class="seg">' + opts.map(o => '<button data-set="' + name + '" data-val="' + o[0] + '" class="' + (String(val) === String(o[0]) ? 'sel' : '') + '">' + o[1] + '</button>').join('') + '</div>';
-  v.innerHTML = '<h2 style="margin-top:4px">Settings</h2>' +
+  v.innerHTML = '<div id="social-account"></div><h2>Settings</h2>' +
     '<div class="card"><label class="f" style="margin-top:0">Weight unit</label>' + seg('unit', [['lb', 'lb'], ['kg', 'kg']], st.unit) +
     '<label class="f">Workout days per week</label>' + seg('daysPerWeek', [[4, '4 days (A B rest C D)'], [5, '5 days (A–E)']], st.daysPerWeek) +
     '<label class="f">Rest timer length</label>' + seg('restSecs', [[45, '45s'], [60, '60s']], st.restSecs) +
@@ -801,7 +805,7 @@ document.addEventListener('click', e => {
   if (id === 'exp') exportJSON();
   else if (id === 'imp') $('#impfile').click();
   else if (id === 'copy') { const txt = JSON.stringify(S, null, 2); (navigator.clipboard ? navigator.clipboard.writeText(txt) : Promise.reject()).then(() => toast('Copied'), () => toast('Copy not available — use Export')); }
-  else if (id === 'clear') { if (confirm('Delete ALL workouts and settings? Export a backup first if unsure.') && confirm('Really delete everything?')) { localStorage.removeItem(KEY); S = normalize({}); viewDay = null; progEx = null; toast('All data cleared'); render(); } }
+  else if (id === 'clear') { if (confirm('Delete ALL workouts and settings? Export a backup first if unsure.') && confirm('Really delete everything?')) { localStorage.removeItem(KEY); S = normalize({}); viewDay = null; progEx = null; emit('live-end'); toast('All data cleared'); render(); } }
 });
 document.addEventListener('change', e => {
   if (e.target.id === 'autorest') { S.settings.autoRest = e.target.checked; save(); }
@@ -813,8 +817,8 @@ document.addEventListener('change', e => {
         const data = JSON.parse(r.result); if (!data || !Array.isArray(data.sessions)) throw new Error('bad');
         const clean = data.sessions.filter(s => s && s.date && s.day).map(s => Object.assign({ id: uid(), entries: [] }, s));
         openDlg('<h2 style="margin-top:0">Import backup</h2><p>Found ' + clean.length + ' sessions.</p><div class="row wrap"><button class="btn primary grow" id="i-merge">Merge with current</button><button class="btn danger grow" id="i-replace">Replace everything</button></div><button class="btn block" data-close style="margin-top:8px">Cancel</button>', root => {
-          $('#i-merge', root).addEventListener('click', () => { const have = new Set(S.sessions.map(s => s.id)); clean.forEach(s => { if (!have.has(s.id)) S.sessions.push(s); }); save(); dlg.close(); render(); toast('Merged ✓'); });
-          $('#i-replace', root).addEventListener('click', () => { S = normalize({ settings: data.settings, sessions: clean }); save(); dlg.close(); viewDay = null; render(); toast('Imported ✓'); });
+          $('#i-merge', root).addEventListener('click', () => { const have = new Set(S.sessions.map(s => s.id)); clean.forEach(s => { if (!have.has(s.id)) S.sessions.push(s); }); save(); emit('sessions-changed'); dlg.close(); render(); toast('Merged ✓'); });
+          $('#i-replace', root).addEventListener('click', () => { S = normalize({ settings: data.settings, sessions: clean }); save(); emit('sessions-changed'); dlg.close(); viewDay = null; render(); toast('Imported ✓'); });
         });
       } catch (err) { toast('That file is not a valid Gym Buddy backup'); }
       e.target.value = '';
@@ -829,9 +833,34 @@ function exportJSON() {
   document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 500); toast('Backup exported');
 }
 
+
+/* ------------------------------------------------------------------ social hooks (used by social.js) */
+const shortTitle = k => ((DAYS[k] || {}).title || '').split(' · ')[0].replace(/\s*✦/g, '').trim();
+function setsInSession(s) { return (s.entries || []).reduce((n, en) => n + (en.sets || []).filter(z => z.done).length, 0); }
+function socialStats() {
+  const ws = weekStart(new Date()); const t0 = ws.getTime(), t1 = t0 + 7 * 864e5;
+  const wk = S.sessions.filter(s => { const t = new Date(s.date).getTime(); return t >= t0 && t < t1; });
+  return { weekKey: dkey(ws), workoutsThisWeek: wk.length, setsThisWeek: wk.reduce((n, s) => n + setsInSession(s), 0),
+    streak: weekStreak(), total: S.sessions.length, goal: S.settings.daysPerWeek };
+}
+function liveInfo(card, setIdx) {
+  if (!S.draft) return null;
+  const main = $$('.mainsec input.cnt'); const done = main.filter(b => b.checked).length;
+  let exercise = '', setNo = null, setOf = null;
+  if (card) {
+    const it = CUR.items[card.dataset.card];
+    exercise = it ? (it.name || exName(it.id)) : '';
+    if (it && setIdx != null && !isNaN(setIdx)) { setNo = setIdx + 1; setOf = it.sets; }
+    else if (it && it.checkOnly && it.sets > 1) { setNo = $$('input.cnt:checked', card).length; setOf = it.sets; }
+    if (/^[wc]\d/.test(card.dataset.card)) exercise = (card.dataset.card[0] === 'w' ? 'Warm-up · ' : 'Cool-down · ') + exercise;
+  }
+  return { day: S.draft.day, dayTitle: shortTitle(S.draft.day), exercise, setNo, setOf, setsDone: done, setsTotal: main.length, startedAt: S.draft.startTs || Date.now() };
+}
+function emitLive(card, setIdx) { const info = liveInfo(card, setIdx); if (info) emit('live', info); }
+
 /* ------------------------------------------------------------------ boot */
 $$('.tabs button').forEach(b => b.addEventListener('click', () => { tab = b.dataset.tab; render(); }));
-window.__gb = { get S() { return S; }, render };
+window.__gb = { get S() { return S; }, set S(v) { S = normalize(v); }, render, save, normalize, socialStats, setsInSession, shortTitle, toast, openDlg, closeDlg: () => dlg.close(), esc, get tab() { return tab; }, setTab(t) { tab = t; render(); }, uid };
 const MOTTOS = [
   'Every rep is a gift to future you ✦',
   'Strong body, calm back, unstoppable you',

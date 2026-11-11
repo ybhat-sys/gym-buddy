@@ -12,6 +12,7 @@
   --radius:14px; --nav-h:60px;
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+[hidden]{display:none!important}
 html,body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.4 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
 body{padding-bottom:calc(var(--nav-h) + 76px + env(safe-area-inset-bottom));overflow-x:hidden}
 h1,h2,h3,.dose,.tag,.chip,.badge,.stat b,.interval .t,.interval .ph,.timerbar .big{font-family:var(--display)}
@@ -161,3 +162,37 @@ input[type=range]{width:100%;accent-color:var(--lav-deep);height:36px}
 .sets input.auto{font-style:italic;color:var(--muted);border-style:dashed}
 .streak{background:var(--lav);border:1.5px solid var(--ink);border-radius:var(--radius);padding:12px;margin:10px 0;box-shadow:var(--shadow);font-family:var(--display);font-size:22px;letter-spacing:.04em;text-align:center}
 .streak small{display:block;font-family:-apple-system,"Segoe UI",Roboto,sans-serif;font-size:13px;letter-spacing:0;color:#2c3340}
+
+/* ---------------------------------------------------------------- social */
+.top-row{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.me-btn{border:0;background:none;padding:0;cursor:pointer;line-height:0}
+.signin-pill{display:inline-block;line-height:1;font-size:13px;font-weight:700;padding:7px 12px;border:1.5px solid var(--ink);border-radius:99px;background:var(--card);box-shadow:var(--shadow)}
+.av{position:relative;flex:0 0 auto;display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:50%;border:1px solid var(--ink);background:var(--mint);overflow:hidden;font:600 13px/1 var(--display);letter-spacing:.04em;color:var(--ink)}
+.av img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1}
+.av.sm{width:34px;height:34px;box-shadow:var(--shadow)}
+.av.lg{width:48px;height:48px;font-size:17px}
+.live{background:var(--mint);border:1px solid var(--ink);border-radius:var(--radius);padding:10px 12px;margin:2px 0 10px}
+.live-hd{font:600 14px/1 var(--display);letter-spacing:.1em;text-transform:uppercase;display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.live-row{display:flex;flex-direction:column;gap:8px}
+.live-card{display:flex;gap:10px;align-items:center;background:var(--card);border:1px solid var(--ink);border-radius:12px;padding:8px 10px}
+.live-empty{display:flex;align-items:center;gap:8px;padding:2px 4px 8px}
+.dot{width:10px;height:10px;border-radius:50%;background:#2f9e63;box-shadow:0 0 0 3px rgba(47,158,99,.25);animation:pulse 1.6s ease-in-out infinite;flex:0 0 auto}
+.dot.off{background:var(--soft-line);box-shadow:none;animation:none}
+@keyframes pulse{50%{box-shadow:0 0 0 6px rgba(47,158,99,0)}}
+@media (prefers-reduced-motion:reduce){.dot{animation:none}}
+.bar.thin{height:6px;margin:5px 0 3px}
+.tiny{font-size:11px}
+.soft-lav{background:var(--accent-soft)}
+.lb-row{display:flex;align-items:center;gap:10px;padding:7px 4px;border-top:1px solid var(--soft-line)}
+.lb-row:first-of-type{border-top:0}
+.lb-row.me{background:var(--butter);border-radius:10px;border-top-color:transparent}
+.lb-rank{width:22px;text-align:center;font:600 16px/1 var(--display);color:var(--muted)}
+.lb-name{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lb-val{font:700 22px/1 var(--display);min-width:32px;text-align:right}
+.feed-item{display:flex;gap:10px;align-items:center}
+.cheer{flex:0 0 auto;min-width:56px;min-height:44px;border:1.5px solid var(--ink);border-radius:99px;background:var(--card);font-size:18px;display:inline-flex;align-items:center;justify-content:center;gap:4px;cursor:pointer}
+.cheer span{font:600 15px/1 var(--display)}
+.cheer.sel{background:var(--peach);box-shadow:var(--shadow)}
+.code-box{font:700 34px/1.2 var(--display);letter-spacing:.2em;text-align:center;background:var(--butter);border:1.5px solid var(--ink);border-radius:12px;padding:12px;margin:8px 0}
+.code-pill{font:700 20px/1 var(--display);letter-spacing:.18em;background:var(--butter);border:1px solid var(--ink);border-radius:10px;padding:10px 12px;text-align:center}
+#sq-switch{margin-bottom:4px}

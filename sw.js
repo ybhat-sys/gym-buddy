@@ -1,7 +1,8 @@
 /* Gym Buddy service worker — precaches everything so the app works offline.
    Bump VERSION whenever any app file or image changes. */
-const VERSION = 'gym-buddy-v6';
-const FILES = ['./', 'index.html', 'app.js', 'styles.css', 'manifest.json', 'fonts/oswald.woff2',
+const VERSION = 'gym-buddy-v7';
+const FILES = ['./', 'index.html', 'app.js', 'social.js', 'firebase-config.js', 'styles.css', 'manifest.json', 'fonts/oswald.woff2',
+  'vendor/firebase-app.js', 'vendor/firebase-auth.js', 'vendor/firebase-firestore.js',
   'icons/icon-192.png', 'icons/icon-512.png', 'icons/icon-maskable-512.png',
 'images/air-bike.png',
   'images/band-lateral-walk.png',
@@ -43,6 +44,7 @@ self.addEventListener('activate', e => {
 });
 self.addEventListener('fetch', e => {
   if (e.request.method !== 'GET') return;
+  if (new URL(e.request.url).origin !== location.origin) return; // Firebase / Google traffic goes straight to the network
   e.respondWith(caches.match(e.request, { ignoreSearch: true }).then(hit => hit || fetch(e.request).then(r => {
     if (r && r.ok && new URL(e.request.url).origin === location.origin) { const copy = r.clone(); caches.open(VERSION).then(c => c.put(e.request, copy)); }
     return r;
