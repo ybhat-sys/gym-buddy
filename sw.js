@@ -1,6 +1,6 @@
 /* Gym Buddy service worker — precaches everything so the app works offline.
    Bump VERSION whenever any app file or image changes. */
-const VERSION = 'gym-buddy-v3';
+const VERSION = 'gym-buddy-v4';
 const FILES = ['./', 'index.html', 'app.js', 'styles.css', 'manifest.json', 'fonts/oswald.woff2',
   'icons/icon-192.png', 'icons/icon-512.png', 'icons/icon-maskable-512.png',
 'images/air-bike.png',

@@ -832,6 +832,19 @@ function exportJSON() {
 /* ------------------------------------------------------------------ boot */
 $$('.tabs button').forEach(b => b.addEventListener('click', () => { tab = b.dataset.tab; render(); }));
 window.__gb = { get S() { return S; }, render };
+const MOTTOS = [
+  'Every rep is a gift to future you ✦',
+  'Strong body, calm back, unstoppable you',
+  '30 minutes. Zero excuses. Let\'s go!',
+  'Progress, not perfection',
+  'You showed up. That\'s the hardest part done',
+  'Stronger than yesterday ✦',
+  'Small wins add up to big change',
+  'Your future self is cheering you on',
+  'Move well today, feel amazing tomorrow',
+  'Consistency is your superpower'
+];
+(() => { const m = document.getElementById('motto'); if (m) { const d = new Date(); const day = Math.floor((d - new Date(d.getFullYear(), 0, 0)) / 864e5); m.textContent = MOTTOS[day % MOTTOS.length]; } })();
 render();
 if ('serviceWorker' in navigator) window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
 })();
