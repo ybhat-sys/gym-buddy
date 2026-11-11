@@ -124,14 +124,14 @@ const COOL = [
 ];
 
 const DAYS = {
-  A: { title: 'Glutes & Hamstrings', blocks: [{ title: 'Main block', items: [
+  A: { title: 'Glute Day ✦ · Glutes & Hamstrings', blocks: [{ title: 'Main event', items: [
     { id: 'hip-thrust', tag: '1a', sets: 3, rmin: 12, rmax: 12, weighted: true },
     { id: 'dead-bug', tag: '1b', sets: 3, rmin: 8, rmax: 8, per: '/side' },
     { id: 'rdl', tag: '2a', sets: 3, rmin: 10, rmax: 10, weighted: true },
     { id: 'clamshell', tag: '2b', sets: 3, rmin: 15, rmax: 15, per: '/side' },
     { id: 'goblet-squat', tag: '3', sets: 2, rmin: 10, rmax: 10, weighted: true }
   ] }] },
-  B: { title: 'Upper + Core', blocks: [{ title: 'Main block', items: [
+  B: { title: 'Strong Arms Day · Upper + Core', blocks: [{ title: 'Main block', items: [
     { id: 'one-arm-row', tag: '1a', sets: 3, rmin: 10, rmax: 10, per: '/side', weighted: true },
     { id: 'bench-press', tag: '1b', sets: 3, rmin: 10, rmax: 10, weighted: true },
     { id: 'half-kneeling-press', tag: '2a', sets: 3, rmin: 8, rmax: 8, per: '/side', weighted: true },
@@ -139,15 +139,15 @@ const DAYS = {
     { id: 'pallof-press', tag: '3a', sets: 2, rmin: 10, rmax: 10, per: '/side' },
     { id: 'side-plank', tag: '3b', sets: 2, rmin: 20, rmax: 30, per: '/side', secs: true }
   ] }] },
-  C: { title: 'Single-Leg + Stability', blocks: [{ title: 'Main block', items: [
+  C: { title: 'Balance Day · Single-Leg + Stability', blocks: [{ title: 'Main block', items: [
     { id: 'bulgarian-split-squat', tag: '1a', sets: 3, rmin: 8, rmax: 8, per: '/side', weighted: true },
     { id: 'single-leg-bridge', tag: '1b', sets: 3, rmin: 10, rmax: 10, per: '/side' },
     { id: 'step-up', tag: '2a', sets: 3, rmin: 8, rmax: 8, per: '/side', weighted: true },
     { id: 'plank', tag: '2b', name: 'Plank with pelvis tucked', sets: 3, rmin: 20, rmax: 40, secs: true },
     { id: 'suitcase-carry', tag: '3', sets: 3, rmin: 30, rmax: 30, per: '/side', secs: true, weighted: true }
   ] }] },
-  D: { title: 'Conditioning + Core', blocks: [
-    { title: 'Intervals — 15 min, pick one', cardio: true, items: [] },
+  D: { title: 'Sweat Day · Conditioning + Core', blocks: [
+    { title: 'Sweaty intervals — 15 min, pick one', cardio: true, items: [] },
     { title: 'Core circuit — 2 rounds', items: [
       { id: 'dead-bug', sets: 2, checkOnly: true, dose: '8/side' },
       { id: 'bird-dog', sets: 2, checkOnly: true, dose: '8/side' },
@@ -155,7 +155,7 @@ const DAYS = {
       { id: 'side-plank', sets: 2, checkOnly: true, dose: '20s/side', hold: 20 }
     ] }
   ] },
-  E: { title: 'Full-body light (optional)', blocks: [
+  E: { title: 'Easy Glow Day ✦ · Light full-body (optional)', blocks: [
     { title: 'Easy cardio', items: [
       { id: 'easy-walk', name: '10 min easy walk (or row)', sets: 1, checkOnly: true, dose: '10 min easy', altImg: 'rower', walkOnlyName: '10 min easy walk' }
     ] },
@@ -288,12 +288,12 @@ function renderBar() {
   if (CD) {
     const left = Math.max(0, (CD.end - Date.now()) / 1000);
     bar.hidden = false; bar.className = 'timerbar' + (CD.ring ? ' ring' : '');
-    bar.innerHTML = '<span class="lbl">' + esc(CD.ring ? 'Go! ' + CD.label + ' finished' : CD.label) + '</span>' +
+    bar.innerHTML = '<span class="lbl">' + esc(CD.ring ? (CD.label === 'Rest' ? 'Rest over — back at it' : CD.label + ' done — nice hold') : CD.label) + '</span>' +
       '<span class="big" id="cd-big">' + mmss(left) + '</span>' +
       (CD.ring ? '' : '<button data-cd="add">+15s</button>') + '<button data-cd="stop">' + (CD.ring ? 'OK' : 'Stop') + '</button>';
   } else if (tab === 'workout') {
     bar.hidden = false; bar.className = 'timerbar';
-    bar.innerHTML = '<span class="lbl">⏱ Rest timer</span><button data-cd="rest45">45s</button><button data-cd="rest60">60s</button>';
+    bar.innerHTML = '<span class="lbl">⏱ Rest up</span><button data-cd="rest45">45s</button><button data-cd="rest60">60s</button>';
   } else { bar.hidden = true; }
 }
 $('#timerbar').addEventListener('click', e => {
@@ -334,7 +334,7 @@ function itTick() {
 function renderIT() {
   const box = $('#it'); if (!box) return;
   const P = PRESETS[IT.preset];
-  const ph = { idle: 'READY WHEN YOU ARE', ready: 'GET READY', work: P.wl, rest: P.rl, done: 'DONE — nice work!' }[IT.phase];
+  const ph = { idle: 'READY WHEN YOU ARE', ready: 'GET READY', work: P.wl, rest: P.rl, done: 'DONE — NICE WORK ✦' }[IT.phase];
   const t = IT.phase === 'idle' ? IT.work : (IT.phase === 'done' ? 0 : IT.remain);
   box.className = 'interval ' + (IT.phase === 'work' ? 'work' : IT.phase === 'rest' ? 'rest' : IT.phase === 'ready' ? 'ready' : '');
   $('#it-ph').textContent = ph; $('#it-t').textContent = mmss(t);
@@ -377,7 +377,7 @@ function startIfNeeded() { if (S.draft && !S.draft.startTs) { S.draft.startTs = 
 function elapsedSec() { return S.draft && S.draft.startTs ? Math.round((Date.now() - S.draft.startTs) / 1000) : 0; }
 function updateElapsed() {
   const el = $('#elapsed'); if (!el) return;
-  el.textContent = S.draft && S.draft.startTs ? '⏱ ' + mmss(elapsedSec()) : 'Not started';
+  el.textContent = S.draft && S.draft.startTs ? '⏱ ' + mmss(elapsedSec()) : 'Not started yet';
   const b = $('#startbtn'); if (b) b.hidden = !!(S.draft && S.draft.startTs);
 }
 setInterval(updateElapsed, 1000);
@@ -405,12 +405,12 @@ function exerciseCard(it, uidKey, section, d) {
   const name = it.name || ex.name;
   const key = uidKey;
   CUR.items[key] = it;
-  const tips = '<details class="tips"><summary>Form cues</summary>' + (ex.caption ? '<div class="small muted" style="margin-top:4px"><i>' + esc(ex.caption) + '</i></div>' : '') + '<ul class="cues">' + ex.cues.map(c => '<li>' + esc(c) + '</li>').join('') + '</ul>' +
+  const tips = '<details class="tips"><summary>Form cues ✦</summary>' + (ex.caption ? '<div class="small muted" style="margin-top:4px"><i>' + esc(ex.caption) + '</i></div>' : '') + '<ul class="cues">' + ex.cues.map(c => '<li>' + esc(c) + '</li>').join('') + '</ul>' +
     '<div class="mistake">⚠ Common mistake: ' + esc(ex.mistake) + '</div></details>';
   const thumb = '<button class="thumb" data-zoom="' + it.id + '" aria-label="Enlarge picture of ' + esc(name) + '"><img src="' + IMG(it.id) + '" alt="' + esc(name) + ' form" loading="lazy"></button>';
   const hold = it.secs && section !== 'main' ? '<button class="btn small" data-hold="' + (it.secs) + '" data-label="' + esc(name) + '">⏱ ' + it.secs + 's</button>' : (it.hold ? '<button class="btn small" data-hold="' + it.hold + '" data-label="' + esc(name) + '">⏱ ' + it.hold + 's</button>' : '');
   const flare = it.flareSwap ? '<span class="badge warn">Flare swap</span> ' : '';
-  const upBadge = it.weighted && readyToAdd(it.id) ? ' <span class="badge up">Ready to add weight ↑</span>' : '';
+  const upBadge = it.weighted && readyToAdd(it.id) ? ' <span class="badge up">Ready to level up ↑</span>' : '';
 
   /* checklist style: warm-up, cool-down and check-only blocks */
   if (section !== 'main' || it.checkOnly) {
@@ -480,11 +480,11 @@ function renderWorkout(v) {
 
   let html = '<div class="chips" role="tablist" aria-label="Pick workout day">' + strip + '</div>' +
     '<div class="sec-title"><h2 style="margin:4px 0">Day ' + viewDay + ' · ' + esc(day.title) + '</h2></div>' +
-    '<div class="card"><div class="switch"><label for="flare"><b>Flare-up day</b><div class="small muted">Swaps RDL, rower, split squat for gentler options</div></label>' +
+    '<div class="card"><div class="switch"><label for="flare"><b>Flare-up day</b><div class="small muted">Swaps RDL, rower &amp; split squat for gentler moves</div></label>' +
     '<input type="checkbox" id="flare"' + (S.settings.flare ? ' checked' : '') + '></div></div>' +
-    (S.settings.flare ? '<div class="banner flare"><b>Flare-up day on.</b> Skipping RDL, rower &amp; Bulgarian split squat. Focus on walking, bridges, bird dogs, dead bugs and nerve glides.</div>' : '') +
-    '<div class="banner warn"><b>Sciatica safety:</b> stop if pain travels down the leg, or you feel numbness or tingling.</div>' +
-    '<div class="card row"><span id="elapsed" class="grow"><b>Not started</b></span><button id="startbtn" class="btn primary small" data-act="start">Start workout</button></div>';
+    (S.settings.flare ? '<div class="banner flare"><b>Flare-up day is on.</b> Skipping RDL, rower &amp; Bulgarian split squat. Today is gentle walking, bridges, bird dogs, dead bugs and nerve glides — be kind to your body.</div>' : '') +
+    '<div class="banner warn"><b>Sciatica safety:</b> stop if pain shoots down your leg or you feel numbness or tingling — no heroics today.</div>' +
+    '<div class="card row"><span id="elapsed" class="grow"><b>Not started</b></span><button id="startbtn" class="btn primary small" data-act="start">Let’s go ✦</button></div>';
 
   html += '<div data-sec="warm"><div class="sec-title"><h2>Warm-up · 5 min</h2><span class="badge" id="cnt-warm"></span></div>' +
     WARM.map((it, i) => exerciseCard(it, 'w' + i + ':' + it.id, 'warm', d)).join('') + '</div>';
@@ -500,9 +500,9 @@ function renderWorkout(v) {
   html += '<div data-sec="cool"><div class="sec-title"><h2>Cool-down · 5 min</h2><span class="badge" id="cnt-cool"></span></div>' +
     cool.map((it, i) => exerciseCard(it, 'c' + i + ':' + it.id, 'cool', d)).join('') + '</div>';
 
-  html += '<div class="banner info"><b>Progression:</b> hit the top of the rep range on all sets with good form → add weight next time. Ticking a set pre-fills the target reps (shown in italics) — tap the box and type to change it if you did fewer.</div>' +
-    '<button class="btn primary block" data-act="finish" style="margin-top:12px">Finish workout</button>' +
-    '<p class="footer-note">Ribs down, slight tailbone tuck, squeeze glutes. This plan is not a substitute for a physical therapist.</p>';
+  html += '<div class="banner info"><b>Level-up rule:</b> Hit the top of the rep range on all sets with good form → add weight next time. Ticking a set pre-fills the target reps (shown in italics) — tap the box and type to change it if you did fewer.</div>' +
+    '<button class="btn primary block" data-act="finish" style="margin-top:12px">Done &amp; dusted!</button>' +
+    '<p class="footer-note">Ribs down, tailbone tucked, glutes squeezed. This plan is not a substitute for a physical therapist.</p>';
   v.innerHTML = html;
   save(); updateCounts(); updateElapsed(); renderIT();
 }
@@ -554,6 +554,7 @@ document.addEventListener('change', e => {
     const arr = S.draft.sets[t.dataset.key]; if (!arr) return; const s = arr[+t.dataset.i]; const it = CUR.items[t.dataset.key];
     s.done = t.checked; startIfNeeded();
     if (t.checked && (s.r === '' || s.r == null) && it) { s.r = it.secs && it.rmin !== it.rmax ? it.rmin : it.rmax; const ri = $('.setr[data-key="' + t.dataset.key + '"][data-i="' + t.dataset.i + '"]'); if (ri) { ri.value = s.r; ri.classList.add('auto'); } }
+    if (t.checked) toast('Nailed it ✓');
     if (t.checked && S.settings.autoRest) startCountdown('Rest', S.settings.restSecs);
     save(); updateCounts(); return;
   }
@@ -590,8 +591,8 @@ function finishDialog() {
   openDlg('<h2 style="margin-top:0">Finish Day ' + S.draft.day + '</h2>' +
     '<label class="f">Duration (minutes)</label><input type="number" class="plain" id="f-min" min="0" inputmode="numeric" value="' + mins + '">' +
     '<label class="f">Pain level during / after (optional)</label>' + painPicker(null) +
-    '<div class="banner warn small">Pain travelling down the leg, numbness or tingling? Stop and consider seeing your physical therapist.</div>' +
-    '<label class="f">Notes (optional)</label><textarea id="f-notes" placeholder="How did it feel? Any adjustments?"></textarea>' +
+    '<div class="banner warn small">Pain shooting down your leg, numbness or tingling? Stop and consider seeing your physical therapist.</div>' +
+    '<label class="f">Notes (optional)</label><textarea id="f-notes" placeholder="How did it feel? Any tweaks?"></textarea>' +
     '<div class="row" style="margin-top:12px"><button class="btn grow" data-close>Back</button><button class="btn primary grow" id="f-save">Save workout</button></div>',
   root => {
     const getPain = bindPain(root, null);
@@ -602,7 +603,7 @@ function finishDialog() {
       if (d.day === 'D' && d.checks.cardio && !S.settings.flare) sess.cardio = { type: d.cardio || IT.preset, work: IT.work, rest: IT.rest, rounds: IT.rounds };
       sess.warmDone = $$('[data-sec="warm"] input.cnt:checked').length; sess.coolDone = $$('[data-sec="cool"] input.cnt:checked').length;
       S.sessions.push(sess); S.draft = null; viewDay = null; save(); dlg.close(); itReset(); stopCountdown();
-      toast('Workout saved ✓'); tab = 'progress'; render();
+      toast('Workout saved — nicely done ✦'); tab = 'progress'; render();
     });
   });
 }
@@ -632,7 +633,7 @@ function niceTicks(lo, hi, n) {
   return out;
 }
 function lineChart(pts, o) {
-  if (!pts.length) return '<p class="muted small">No data yet — finish a workout to see this chart.</p>';
+  if (!pts.length) return '<p class="muted small">No data yet — finish a workout and your progress shows up here.</p>';
   const W = 640, H = 250, L = 46, R = 22, T = 22, B = 34;
   let t0 = pts[0].t, t1 = pts[pts.length - 1].t; if (t0 === t1) { t0 -= 864e5; t1 += 864e5; }
   let lo = o.yMin != null ? o.yMin : Math.min.apply(null, pts.map(p => p.y)), hi = o.yMax != null ? o.yMax : Math.max.apply(null, pts.map(p => p.y));
@@ -666,6 +667,7 @@ function renderProgress(v) {
 
   let h = '<h2 style="margin-top:4px">This week</h2><div class="card"><div class="row"><b class="grow">' + cnt + ' of ' + goal + ' workouts</b><span class="muted small">goal ' + goal + '/week</span></div>' +
     '<div class="bar" style="margin-top:8px"><i style="width:' + Math.min(100, cnt / goal * 100) + '%"></i></div></div>' +
+    '<div class="streak">' + (weekStreak() > 0 ? 'You’re on fire 🔥 ' + weekStreak() + (weekStreak() === 1 ? ' week' : ' weeks') + ' in a row' : 'Your streak starts with one workout') + '<small>Hit your ' + goal + ' workouts a week to keep it going</small></div>' +
     '<div class="stats"><div class="stat"><b>' + weekStreak() + '</b><span>week streak</span></div><div class="stat"><b>' + S.sessions.length + '</b><span>total sessions</span></div><div class="stat"><b>' + (ss.length ? fmtDate(ss[ss.length - 1].date, { month: 'short', day: 'numeric' }) : '—') + '</b><span>last workout</span></div></div>';
 
   /* calendar */
@@ -680,7 +682,7 @@ function renderProgress(v) {
   h += '</div></div>';
 
   /* weight chart */
-  h += '<h2>Weight over time</h2><div class="card">';
+  h += '<h2>Strength progress</h2><div class="card">';
   if (exList.length) {
     h += '<select id="progex" aria-label="Exercise">' + exList.map(id => '<option value="' + id + '"' + (id === progEx ? ' selected' : '') + '>' + esc(exName(id)) + '</option>').join('') + '</select><div class="small muted" style="margin:6px 0">Top set per session, in ' + unit() + '</div>';
     const pts = []; ss.forEach(s => { (s.entries || []).filter(en => en.ex === progEx).forEach(en => { const ws = en.sets.filter(z => z.done && z.w > 0).map(z => toDisp(z.w)); if (ws.length) { const mx = Math.max.apply(null, ws); pts.push({ t: new Date(s.date).getTime(), y: mx, lbl: mx + ' ' + unit(), tip: fmtDate(s.date) + ': ' + mx + ' ' + unit() }); } }); });
@@ -690,11 +692,11 @@ function renderProgress(v) {
 
   /* pain chart */
   const pp = ss.filter(s => s.pain != null).map(s => ({ t: new Date(s.date).getTime(), y: s.pain, lbl: String(s.pain), tip: fmtDate(s.date) + ': pain ' + s.pain + '/10' }));
-  h += '<h2>Pain trend</h2><div class="card">' + (pp.length ? '<div class="small muted">Pain level (0–10) at the end of each session</div>' : '') + lineChart(pp, { yMin: 0, yMax: 10, c2: true, label: 'Pain level over time' }) + '</div>';
+  h += '<h2>Pain check-in</h2><div class="card">' + (pp.length ? '<div class="small muted">Pain level (0–10) at the end of each session</div>' : '') + lineChart(pp, { yMin: 0, yMax: 10, c2: true, label: 'Pain level over time' }) + '</div>';
 
   /* history */
   h += '<h2>History</h2>';
-  if (!ss.length) h += '<div class="card muted">No workouts logged yet.</div>';
+  if (!ss.length) h += '<div class="card muted">Nothing logged yet — your first workout is waiting for you.</div>';
   ss.slice().reverse().forEach(s => {
     const pc = s.pain == null ? '' : '<span class="pain ' + (s.pain <= 2 ? 'p0' : s.pain <= 5 ? 'p1' : 'p2') + '">Pain ' + s.pain + '/10</span>';
     const lines = (s.entries || []).map(en => {
@@ -749,7 +751,7 @@ function editDialog(id) {
         const [ei, si, f] = inp.dataset.e.split('.'); const z = s.entries[+ei].sets[+si];
         if (f === 'd') z.done = inp.checked; else if (f === 'r') z.r = inp.value === '' ? null : +inp.value; else if (inp.value !== inp.dataset.orig) z.w = inp.value === '' ? null : +fromDisp(+inp.value).toFixed(2);
       });
-      save(); dlg.close(); render(); toast('Saved');
+      save(); dlg.close(); render(); toast('Saved ✓');
     });
   });
 }
@@ -789,7 +791,7 @@ function renderSettings(v) {
     '<div class="row wrap" style="margin-top:8px"><button class="btn small grow" id="copy">Copy JSON to clipboard</button></div>' +
     '<input type="file" id="impfile" accept="application/json,.json" hidden></div>' +
     '<h2>Reset</h2><div class="card"><button class="btn danger block" id="clear">Clear all data</button></div>' +
-    '<div class="banner warn small"><b>Disclaimer:</b> this app is not a substitute for a physical therapist. Stop and seek advice if pain travels down the leg or you notice numbness or tingling.</div>' +
+    '<div class="banner warn small"><b>Disclaimer:</b> This app is not a substitute for a physical therapist. Stop and seek advice if pain shoots down your leg or you notice numbness or tingling.</div>' +
     '<p class="footer-note">Gym Buddy · data stored locally in this browser (' + S.sessions.length + ' sessions)</p>';
 }
 document.addEventListener('click', e => {
@@ -811,8 +813,8 @@ document.addEventListener('change', e => {
         const data = JSON.parse(r.result); if (!data || !Array.isArray(data.sessions)) throw new Error('bad');
         const clean = data.sessions.filter(s => s && s.date && s.day).map(s => Object.assign({ id: uid(), entries: [] }, s));
         openDlg('<h2 style="margin-top:0">Import backup</h2><p>Found ' + clean.length + ' sessions.</p><div class="row wrap"><button class="btn primary grow" id="i-merge">Merge with current</button><button class="btn danger grow" id="i-replace">Replace everything</button></div><button class="btn block" data-close style="margin-top:8px">Cancel</button>', root => {
-          $('#i-merge', root).addEventListener('click', () => { const have = new Set(S.sessions.map(s => s.id)); clean.forEach(s => { if (!have.has(s.id)) S.sessions.push(s); }); save(); dlg.close(); render(); toast('Merged'); });
-          $('#i-replace', root).addEventListener('click', () => { S = normalize({ settings: data.settings, sessions: clean }); save(); dlg.close(); viewDay = null; render(); toast('Imported'); });
+          $('#i-merge', root).addEventListener('click', () => { const have = new Set(S.sessions.map(s => s.id)); clean.forEach(s => { if (!have.has(s.id)) S.sessions.push(s); }); save(); dlg.close(); render(); toast('Merged ✓'); });
+          $('#i-replace', root).addEventListener('click', () => { S = normalize({ settings: data.settings, sessions: clean }); save(); dlg.close(); viewDay = null; render(); toast('Imported ✓'); });
         });
       } catch (err) { toast('That file is not a valid Gym Buddy backup'); }
       e.target.value = '';
