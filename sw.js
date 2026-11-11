@@ -1,6 +1,6 @@
 /* Gym Buddy service worker — precaches everything so the app works offline.
    Bump VERSION whenever any app file or image changes. */
-const VERSION = 'gym-buddy-v2';
+const VERSION = 'gym-buddy-v3';
 const FILES = ['./', 'index.html', 'app.js', 'styles.css', 'manifest.json', 'fonts/oswald.woff2',
   'icons/icon-192.png', 'icons/icon-512.png', 'icons/icon-maskable-512.png',
 'images/air-bike.png',
@@ -36,7 +36,7 @@ const FILES = ['./', 'index.html', 'app.js', 'styles.css', 'manifest.json', 'fon
   'images/suitcase-carry.png'];
 
 self.addEventListener('install', e => {
-  e.waitUntil(caches.open(VERSION).then(c => c.addAll(FILES)).then(() => self.skipWaiting()));
+  e.waitUntil(caches.open(VERSION).then(c => Promise.all(FILES.map(f => c.add(new Request(f, { cache: 'reload' }))))).then(() => self.skipWaiting()));
 });
 self.addEventListener('activate', e => {
   e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => k !== VERSION).map(k => caches.delete(k)))).then(() => self.clients.claim()));
